@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skill Path</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    header {
+      background: cornflowerblue;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      margin: 0 auto;
+    }
+
+    .lesson-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-left: 10px;
+
+    }
+
+    .img-div{
+        width: 100%;
+        max-height: 200px;
+        min-width: 100%;
+    }
+
+    .lesson-desc{
+        display: flex;
+        flex-direction: column;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .add-btn {
+      background: cornflowerblue;
+      color: white;
+      width: 100%;
+    }
+
+    .add-btn:disabled {
+      background: grey;
+      cursor: not-allowed;
+    }
+
+    .view-cart-btn {
+      background: cornflowerblue;
+      color: white;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .view-cart-btn:disabled {
+      background: grey;
+      cursor: not-allowed;
+    }
+
+    .cart-box {
+      background: white;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<bod id="app">
+  <header>
+    <h1>Skill Path</h1>
+  </header>
+   <button class="view-cart-btn" :disabled="cart.length < 1" @click="showCart = !showCart">
+      {{ showCart ? "Hide Cart" : "View Cart (" + cart.length + ")" }}
+    </button>
+ 
+  <div class="container">
+
+
+    
+    <div v-for="lesson in lessons" :key="lesson.id" class="lesson-card">
+      <div>
+        <img :src="lesson.img_url" alt="" class="img-div"/>
+        <div class="lesson-desc">
+        <p><strong>Price:</strong> Rs {{ lesson.price }}</p>
+        <p><strong>Available:</strong> {{ lesson.spaces }}</p>
+        <p><strong>Location:</strong> {{ lesson.location }}</p>
+        <p><strong>Subject:</strong> {{ lesson.subject }}</p>
+      </div>
+
+      <button
+        class="add-btn"
+        :disabled="lesson.spaces < 1"
+        @click="addToCart(lesson)"
+      >
+        Add to Cart
+      </button>
+    </div>
+        </div>
+
+
+    <!-- VIEW CART BUTTON -->
+    <button class="view-cart-btn" :disabled="cart.length < 1" @click="showCart = !showCart">
+      {{ showCart ? "Hide Cart" : "View Cart (" + cart.length + ")" }}
+    </button>
+
+    <!-- CART SECTION -->
+    <div v-if="showCart" class="cart-box">
+      <h2>Your Cart</h2>
+      <div v-if="cart.length === 0">No items in cart.</div>
+
+      <ul>
+        <li v-for="item in cart" :key="item.id">
+          {{ item.title }} — Rs {{ item.price }}
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          lessons: [],
+          cart: [],
+          showCart: false,
+        };
+      },
+      methods: {
+        async fetchLessons() {
+          try {
+            const res = await fetch("http://localhost:5000/api/classes");
+            console.log("response", res)
+            const data = await res.json();
+            this.lessons = data;
+          } catch (err) {
+            console.error("Failed to load lessons", err);
+          }
+        },
+      addToCart(lesson) {
+
+       console.log("lesson", lesson);
+
+  if (lesson.spaces > 0) {
+    this.cart.push(lesson);
+    lesson.spaces -= 1;
+
+    fetch("http://localhost:3000/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ classId: lesson.id })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("Backend cart updated:", data);
+    })
+    .catch(err => console.error("Add to cart failed:", err));
+  }
+}
+
+      },
+      mounted() {
+        this.fetchLessons();
+      },
+    }).mount("#app");
+  </script>
+</body>
+</html>

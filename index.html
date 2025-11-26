@@ -86,15 +86,24 @@
     }
 
     .cart-box {
-      background: white;
+      background: rgb(255, 255, 255);
       margin-top: 20px;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+
+    .cart-list{
+         display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      justify-content: space-between;
+
+     
+    }
   </style>
 </head>
-<bod id="app">
+<body id="app">
   <header>
     <h1>Skill Path</h1>
   </header>
@@ -106,7 +115,7 @@
 
 
     
-    <div v-for="lesson in lessons" :key="lesson.id" class="lesson-card">
+    <div v-for="lesson in lessons" :key="lesson.id" class="lesson-card" v-if="!showCart">
       <div>
         <img :src="lesson.img_url" alt="" class="img-div"/>
         <div class="lesson-desc">
@@ -126,20 +135,34 @@
     </div>
         </div>
 
-
-    <!-- VIEW CART BUTTON -->
+<!-- 
     <button class="view-cart-btn" :disabled="cart.length < 1" @click="showCart = !showCart">
       {{ showCart ? "Hide Cart" : "View Cart (" + cart.length + ")" }}
-    </button>
-
+    </button> -->
+  </div>
     <!-- CART SECTION -->
-    <div v-if="showCart" class="cart-box">
+    <div v-if="showCart" class="cart-box" >
       <h2>Your Cart</h2>
       <div v-if="cart.length === 0">No items in cart.</div>
 
-      <ul>
+      <ul class="cart-list">
         <li v-for="item in cart" :key="item.id">
-          {{ item.title }} — Rs {{ item.price }}
+ <div>
+        <img :src="item.img_url" alt="" class="img-div"/>
+        <div class="lesson-desc">
+        <p><strong>Price:</strong> Rs {{ item.price }}</p>
+        <p><strong>Location:</strong> {{ item.location }}</p>
+        <p><strong>Quantity:</strong> {{ item .quantity }}</p>
+        <p><strong>Subject:</strong> {{ item.subject }}</p>
+         <button
+        class="add-btn"
+        :disabled="item.spaces < 1"
+        @click="deleteFromCart(item.classId)"
+      >
+        Remove from Cart
+      </button>
+      </div>
+    </div>
         </li>
       </ul>
     </div>
@@ -168,6 +191,37 @@
             console.error("Failed to load lessons", err);
           }
         },
+           async deleteFromCart(class_id) {
+            console.log("class_id", class_id)
+             const lessonIndex = this.cart.findIndex(l => l.classId === class_id);
+                if (lessonIndex === -1) return;
+
+                if (this.cart[lessonIndex].quantity > 1) {
+                    this.cart[lessonIndex].quantity -= 1;
+                } else {
+                    this.cart.splice(lessonIndex, 1);
+                }
+          try {
+            const res = await fetch(`http://localhost:5000/api/cart/decrease/${class_id}`,{
+                method:"PUT"
+            });
+            console.log("response", res)
+            const data = await res.json();
+            this.lessons = data;
+          } catch (err) {
+            console.error("Failed to load lessons", err);
+          }
+        },
+          async fetchCart() {
+          try {
+            const res = await fetch("http://localhost:5000/api/cart");
+            console.log("cart response", res)
+            const data = await res.json();
+            this.cart = data;
+          } catch (err) {
+            console.error("Failed to load lessons", err);
+          }
+        },
       addToCart(lesson) {
 
        console.log("lesson", lesson);
@@ -176,13 +230,14 @@
     this.cart.push(lesson);
     lesson.spaces -= 1;
 
-    fetch("http://localhost:3000/add", {
+    fetch("http://localhost:5000/api/cart/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ classId: lesson.id })
     })
     .then(res => res.json())
     .then(data => {
+        this.fetchCart()
       console.log("Backend cart updated:", data);
     })
     .catch(err => console.error("Add to cart failed:", err));
@@ -192,6 +247,7 @@
       },
       mounted() {
         this.fetchLessons();
+        this.fetchCart();
       },
     }).mount("#app");
   </script>

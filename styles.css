@@ -101,7 +101,6 @@ button {
   cursor: not-allowed;
 }
 
-/* SEARCH BAR */
 .search-box {
   display: block;
   width: 100%;
@@ -114,7 +113,6 @@ button {
   font-size: 1rem;
 }
 
-/* CART BOX */
 .cart-box {
   background: white;
   max-width: 800px;
@@ -129,7 +127,6 @@ button {
   font-size: 1.4rem;
 }
 
-/* CART ITEMS */
 .cart-list {
   list-style: none;
   padding: 0;

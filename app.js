@@ -70,8 +70,6 @@
     });
 
     this.cart = Object.values(grouped);
-
-
   } catch (err) {
     console.error("Failed to load cart", err);
   }
@@ -106,7 +104,6 @@ async searchLessons() {
   `http://localhost:5000/api/classes/search?q=${encodeURIComponent(this.searchQuery)}`
   );
 
-  
   const data = await res.json();
 
   this.lessons = data;
@@ -129,8 +126,6 @@ sortLessons() {
     }
   });
 },
-
-
 submitCheckout() {
   this.orderMessage =
     `Order submitted! Thank you, ${this.checkoutName}. We will contact you at ${this.checkoutPhone}.`;
@@ -156,10 +151,6 @@ submitCheckout() {
     window.location.reload();
   });
 }
-
-
-
-
       },
       computed: {
   validCheckout() {
@@ -172,7 +163,6 @@ submitCheckout() {
     );
   }
 },
-
       mounted() {
         this.fetchLessons();
         this.fetchCart();

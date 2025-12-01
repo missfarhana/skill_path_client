@@ -69,10 +69,8 @@
       }
     });
 
-    // Convert back to array for v-for
     this.cart = Object.values(grouped);
 
-    console.log("Grouped cart", this.cart);
 
   } catch (err) {
     console.error("Failed to load cart", err);

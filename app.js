@@ -131,19 +131,8 @@ sortLessons() {
     }
   });
 },
-// submitCheckout() {
-//   this.orderMessage =
-//     `Order submitted! Thank you, ${this.checkoutName}. We will contact you at ${this.checkoutPhone}.`;
 
-//   alert(this.orderMessage);
 
-//   this.cart = [];
-
-//   this.checkoutName = "";
-//   this.checkoutPhone = "";
-
-//   this.showCart = false;
-// },
 submitCheckout() {
   this.orderMessage =
     `Order submitted! Thank you, ${this.checkoutName}. We will contact you at ${this.checkoutPhone}.`;

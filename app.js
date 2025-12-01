@@ -50,37 +50,52 @@
             console.error("Failed to load lessons", err);
           }
         },
-          async fetchCart() {
-          try {
-            const res = await fetch("http://localhost:5000/api/cart");
-            console.log("cart response", res)
-            const data = await res.json();
-            this.cart = data;
-          } catch (err) {
-            console.error("Failed to load lessons", err);
-          }
-        },
-      addToCart(lesson) {
+      async fetchCart() {
+  try {
+    const res = await fetch("http://localhost:5000/api/cart");
+    const data = await res.json();
 
-       console.log("lesson", lesson);
+    // Group items by classId and count quantity
+    const grouped = {};
 
-  if (lesson.spaces > 0) {
-    this.cart.push(lesson);
-    lesson.spaces -= 1;
+    data.forEach(item => {
+      if (!grouped[item.classId]) {
+        grouped[item.classId] = {
+          ...item,
+          quantity: 1,     // start quantity
+        };
+      } else {
+        grouped[item.classId].quantity += 1;  // increase quantity
+      }
+    });
 
-    fetch("http://localhost:5000/api/cart/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ classId: lesson.id })
-    })
-    .then(res => res.json())
-    .then(data => {
-        this.fetchCart()
-      console.log("Backend cart updated:", data);
-    })
-    .catch(err => console.error("Add to cart failed:", err));
+    // Convert back to array for v-for
+    this.cart = Object.values(grouped);
+
+    console.log("Grouped cart", this.cart);
+
+  } catch (err) {
+    console.error("Failed to load cart", err);
   }
-},
+}
+,
+   addToCart(lesson) {
+  if (lesson.spaces <= 0) return;
+
+  lesson.spaces--;
+
+  fetch("http://localhost:5000/api/cart/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ classId: lesson.id })
+  })
+  .then(res => res.json())
+  .then(data => {
+    this.cart = data;  
+  })
+  .catch(err => console.error("Add to cart failed:", err));
+}
+,
 async searchLessons() {
   if (this.searchQuery.trim() === "") {
     this.fetchLessons();
@@ -150,6 +165,8 @@ submitCheckout() {
   .then(data => {
     alert(this.orderMessage);
     this.cart = [];    
+    // this.showCart = false;
+    window.location.reload();
   });
 }
 

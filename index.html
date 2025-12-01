@@ -77,7 +77,7 @@
       <div v-if="cart.length === 0">No items in cart.</div>
 
       <ul class="cart-list">
-        <li v-for="item in cart" :key="item.id">
+        <li v-for="item in cart" :key="item.classId">
  <div>
         <img :src="item.img_url" alt="" class="img-div"/>
         <div class="lesson-desc">

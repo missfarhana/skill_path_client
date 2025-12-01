@@ -62,10 +62,10 @@
       if (!grouped[item.classId]) {
         grouped[item.classId] = {
           ...item,
-          quantity: 1,     // start quantity
+          quantity: 1,     
         };
       } else {
-        grouped[item.classId].quantity += 1;  // increase quantity
+        grouped[item.classId].quantity += 1;  
       }
     });
 

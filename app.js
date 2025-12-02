@@ -19,7 +19,7 @@
       methods: {
         async fetchLessons() {
           try {
-            const res = await fetch("http://localhost:5000/api/classes");
+            const res = await fetch("https://skill-path-antv.onrender.com/api/classes");
             console.log("response", res)
             const data = await res.json();
             this.lessons = data;
@@ -38,7 +38,7 @@
                     this.cart.splice(lessonIndex, 1);
                 }
           try {
-            const res = await fetch(`http://localhost:5000/api/cart/decrease/${class_id}`,{
+            const res = await fetch(`https://skill-path-antv.onrender.com/api/cart/decrease/${class_id}`,{
                 method:"PUT"
             });
             console.log("response", res)
@@ -52,7 +52,7 @@
         },
       async fetchCart() {
   try {
-    const res = await fetch("http://localhost:5000/api/cart");
+    const res = await fetch("https://skill-path-antv.onrender.com/api/cart");
     const data = await res.json();
 
     // Group items by classId and count quantity
@@ -80,7 +80,7 @@
 
   lesson.spaces--;
 
-  fetch("http://localhost:5000/api/cart/add", {
+  fetch("https://skill-path-antv.onrender.com/api/cart/add", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ classId: lesson.id })
@@ -101,7 +101,7 @@ async searchLessons() {
   this.searching = true;
 
   const res = await fetch(
-  `http://localhost:5000/api/classes/search?q=${encodeURIComponent(this.searchQuery)}`
+  `https://skill-path-antv.onrender.com/api/classes/search?q=${encodeURIComponent(this.searchQuery)}`
   );
 
   const data = await res.json();
@@ -133,7 +133,7 @@ submitCheckout() {
   const lessonIDs = this.cart.map(item => item.classId);
   const quantities = this.cart.map(item => item.quantity);
 
-  fetch("http://localhost:5000/api/checkout", {
+  fetch("https://skill-path-antv.onrender.com/api/checkout", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
